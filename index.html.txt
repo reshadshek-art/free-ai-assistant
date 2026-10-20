@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free AI Assistant</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        @keyframes pulse-dots {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        .dot-1 { animation: pulse-dots 1.4s infinite 0s; }
+        .dot-2 { animation: pulse-dots 1.4s infinite 0.2s; }
+        .dot-3 { animation: pulse-dots 1.4s infinite 0.4s; }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans h-screen flex flex-col justify-between antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- Header Section -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid font-bold text-lg fa-robot"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-800 text-lg sm:text-xl leading-tight">Free AI Assistant</h1>
+                    <p class="text-xs text-slate-500">প্রথম সংস্করণ • ডেমো মোড (Demo Mode)</p>
+                </div>
+            </div>
+            
+            <button id="newChatBtn" onclick="resetChat()" class="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-medium rounded-lg transition-colors border border-slate-300">
+                <i class="fa-solid fa-plus"></i>
+                <span class="hidden sm:inline">নতুন চ্যাট</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Chat Area -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 flex flex-col min-h-0">
+        
+        <!-- Messages Scroll Container -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto space-y-4 pr-1 pb-4">
+            
+            <!-- Welcome Message -->
+            <div class="flex items-start space-x-3 max-w-[85%] sm:max-w-[75%]">
+                <div class="w-8 h-8 rounded-full bg-emerald-600 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold shadow">
+                    AI
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm text-slate-800 text-sm leading-relaxed">
+                    👋 <strong>স্বাগতম!</strong> আমি আপনার ফ্রি AI Assistant। <br><br>
+                    আমি আপনাকে Data Entry, Excel সূত্র এবং Freelancing সম্পর্কিত যেকোনো তথ্য বা কাজে সাহায্য করতে পারি। নিচের দ্রুত প্রশ্নের বোতামগুলোতে ক্লিক করুন অথবা আপনার প্রশ্ন লিখে নিচে পাঠাতে পারেন!
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Typing Indicator (Hidden by Default) -->
+        <div id="typingIndicator" class="hidden mb-3">
+            <div class="flex items-center space-x-3 max-w-[85%]">
+                <div class="w-8 h-8 rounded-full bg-emerald-600 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">
+                    AI
+                </div>
+                <div class="bg-white px-4 py-2.5 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm text-slate-500 text-xs flex items-center space-x-1.5">
+                    <span>AI উত্তর লিখছে</span>
+                    <span class="flex space-x-0.5">
+                        <span class="dot-1 h-1.5 w-1.5 bg-slate-500 rounded-full"></span>
+                        <span class="dot-2 h-1.5 w-1.5 bg-slate-500 rounded-full"></span>
+                        <span class="dot-3 h-1.5 w-1.5 bg-slate-500 rounded-full"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input & Quick Actions Container -->
+        <div class="mt-auto pt-2">
+            
+            <!-- Quick Action Preset Buttons -->
+            <div class="mb-2.5 flex items-center space-x-2 overflow-x-auto pb-1 text-xs">
+                <span class="text-slate-400 font-medium whitespace-nowrap text-[11px]"><i class="fa-solid fa-bolt text-amber-500 mr-1"></i> দ্রুত প্রশ্ন:</span>
+                
+                <button onclick="applyPreset('ডাটা এন্ট্রি (Data Entry) কাজের জন্য সেরা টিপস দাও।')" class="whitespace-nowrap px-3 py-1.5 bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 rounded-full transition-all shadow-sm flex items-center space-x-1">
+                    <span>📊 Data Entry</span>
+                </button>
+                
+                <button onclick="applyPreset('Excel-এ VLOOKUP সূত্র কীভাবে ব্যবহার করব?')" class="whitespace-nowrap px-3 py-1.5 bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 rounded-full transition-all shadow-sm flex items-center space-x-1">
+                    <span>📈 Excel Formula</span>
+                </button>
+                
+                <button onclick="applyPreset('নতুন ফ্রিল্যান্সারদের জন্য আপওয়ার্ক ও ফাইভারে সফল হওয়ার উপায় কী?')" class="whitespace-nowrap px-3 py-1.5 bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 rounded-full transition-all shadow-sm flex items-center space-x-1">
+                    <span>💼 Freelancing Tips</span>
+                </button>
+            </div>
+
+            <!-- Input Box & Send Button -->
+            <form id="chatForm" onsubmit="handleSend(event)" class="relative flex items-center">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    placeholder="বাংলা বা ইংরেজিতে প্রশ্ন লিখুন... (Ask anything)" 
+                    class="w-full pl-4 pr-12 py-3 bg-white border border-slate-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm text-sm text-slate-800 placeholder-slate-400"
+                    autocomplete="off"
+                >
+                <button 
+                    type="submit" 
+                    id="sendBtn"
+                    class="absolute right-2 w-9 h-9 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl flex items-center justify-center transition-colors shadow-sm focus:outline-none"
+                    title="Send"
+                >
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+            
+            <p class="text-[10px] text-center text-slate-400 mt-2">
+                এটি একটি রেসপন্সিভ চ্যাট ডেমো ইন্টারফেস। আসল AI মডেলের উত্তর পেতে পরবর্তী ধাপে API যোগ করা হবে।
+            </p>
+        </div>
+
+    </main>
+
+    <!-- JavaScript Logical Implementation -->
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Preset Prompt Auto Fill
+        function applyPreset(text) {
+            userInput.value = text;
+            userInput.focus();
+        }
+
+        // Handle Send Form
+        function handleSend(event) {
+            event.preventDefault();
+            const query = userInput.value.trim();
+            if (!query) return;
+
+            // 1. Add User Message
+            appendUserMessage(query);
+            userInput.value = '';
+
+            // 2. Show Typing Indicator
+            showTyping(true);
+
+            // 3. Simulate AI Response after 1 second delay
+            setTimeout(() => {
+                showTyping(false);
+                const simulatedAnswer = getSimulatedResponse(query);
+                appendAIMessage(simulatedAnswer);
+            }, 1000);
+        }
+
+        // Render User Message
+        function appendUserMessage(text) {
+            const msgHTML = `
+                <div class="flex items-start justify-end space-x-3 max-w-[85%] sm:max-w-[75%] ml-auto">
+                    <div class="bg-emerald-600 p-3.5 rounded-2xl rounded-tr-none text-white text-sm leading-relaxed shadow-sm">
+                        ${escapeHtml(text)}
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold shadow">
+                        আপনি
+                    </div>
+                </div>
+            `;
+            chatMessages.insertAdjacentHTML('beforeend', msgHTML);
+            scrollToBottom();
+        }
+
+        // Render AI Message
+        function appendAIMessage(text) {
+            const msgHTML = `
+                <div class="flex items-start space-x-3 max-w-[85%] sm:max-w-[75%]">
+                    <div class="w-8 h-8 rounded-full bg-emerald-600 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold shadow">
+                        AI
+                    </div>
+                    <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm text-slate-800 text-sm leading-relaxed">
+                        ${text}
+                    </div>
+                </div>
+            `;
+            chatMessages.insertAdjacentHTML('beforeend', msgHTML);
+            scrollToBottom();
+        }
+
+        // Typing Indicator Toggle
+        function showTyping(show) {
+            if (show) {
+                typingIndicator.classList.remove('hidden');
+            } else {
+                typingIndicator.classList.add('hidden');
+            }
+            scrollToBottom();
+        }
+
+        // Scroll to Bottom Helper
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Reset Chat
+        function resetChat() {
+            chatMessages.innerHTML = `
+                <div class="flex items-start space-x-3 max-w-[85%] sm:max-w-[75%]">
+                    <div class="w-8 h-8 rounded-full bg-emerald-600 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold shadow">
+                        AI
+                    </div>
+                    <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm text-slate-800 text-sm leading-relaxed">
+                        👋 <strong>নতুন চ্যাট শুরু হয়েছে!</strong><br><br>
+                        আমি আপনাকে কী বিষয়ে সাহায্য করতে পারি?
+                    </div>
+                </div>
+            `;
+            userInput.value = '';
+        }
+
+        // Demo Simulated Intelligence Logic
+        function getSimulatedResponse(query) {
+            const lower = query.toLowerCase();
+            
+            if (lower.includes('data entry') || lower.includes('ডাটা এন্ট্রি')) {
+                return `<strong>Data Entry সংক্রান্ত পরামর্শ (Demo Response):</strong><br><br>
+                ১. <strong>Excel & Google Sheets:</strong> Fast Typing এবং Keyboard Shortcuts ভালোমতো শিখুন।<br>
+                ২. <strong>Accuracy:</strong> ভুলের পরিমাণ কমাতে ডাটা ভ্যালিডেশন অপশন ব্যবহার করুন।<br>
+                ৩. <strong>Tooling:</strong> MS Excel, Google Docs, Canva, Notion এবং OCR টেক্সট কনভার্টার জানা থাকলে কাজ পেতে সুবিধা হবে।`;
+            } else if (lower.includes('excel') || lower.includes('vlookup') || lower.includes('সূত্র')) {
+                return `<strong>Excel Formula টিপস (Demo Response):</strong><br><br>
+                <code>=VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])</code><br><br>
+                উদাহরণ: নির্দিষ্ট কোনো গ্রাহকের ID দিয়ে নাম বা ব্যালেন্স খোঁজার জন্য VLOOKUP খুব দরকারী একটি ফর্মুলা।`;
+            } else if (lower.includes('freelance') || lower.includes('ফ্রিল্যান্সিং')) {
+                return `<strong>Freelancing সফলতার নির্দেশিকা (Demo Response):</strong><br><br>
+                ১. নির্দিষ্ট একটি বিষয়ে Skill অর্জনে অন্তত ৩-৬ মাস সময় দিন।<br>
+                ২. ভালো একটি পোরটফোলিও (Portfolio) তৈরি করুন।<br>
+                ৩.Upwork, Fiverr বা LinkedIn-এ আবেদন করার সময় ক্লায়েন্টের প্রবলেম সমাধানের ওপর গুরুত্ব দিন।`;
+            } else {
+                return `ধন্যবাদ আপনার প্রশ্নের জন্য: <em>"${escapeHtml(query)}"</em><br><br>✅ <strong>ইন্টারফেস টেস্ট সফল:</strong> সফটওয়্যারটি আপনার বার্তা সঠিকভাবে গ্রহণ করেছে! এটি বর্তমানে ডেমো মোডে রয়েছে। পরবর্তী ধাপে বাস্তব AI API কানেক্ট করার পর এখানে সরাসরি এআই-এর পূর্ণাঙ্গ উত্তর আসবে।`;
+            }
+        }
+
+        // Security Helper
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
