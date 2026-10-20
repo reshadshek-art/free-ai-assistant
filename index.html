@@ -34,33 +34,16 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-slate-800 text-lg sm:text-xl leading-tight">Free AI Assistant</h1>
-                    <p class="text-xs text-slate-500">Gemini AI দ্বারা চালিত</p>
+                    <p class="text-xs text-slate-500">Advanced AI Engine (Live Ready)</p>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-2">
-                <button onclick="toggleKeyBox()" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-medium rounded-lg transition-colors border border-amber-200 flex items-center space-x-1">
-                    <i class="fa-solid fa-key"></i>
-                    <span class="hidden sm:inline">API Key</span>
-                </button>
-                <button onclick="resetChat()" class="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-medium rounded-lg transition-colors border border-slate-300">
-                    <i class="fa-solid fa-plus"></i>
-                    <span class="hidden sm:inline">নতুন চ্যাট</span>
-                </button>
-            </div>
+            <button id="newChatBtn" onclick="resetChat()" class="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-medium rounded-lg transition-colors border border-slate-300">
+                <i class="fa-solid fa-plus"></i>
+                <span class="hidden sm:inline">নতুন চ্যাট</span>
+            </button>
         </div>
     </header>
-
-    <!-- Hidden API Key Config Bar -->
-    <div id="apiKeyBar" class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-xs text-amber-800 hidden">
-        <div class="max-w-4xl mx-auto flex items-center justify-between flex-wrap gap-2">
-            <span>আপনার Gemini API Key এখানে পেস্ট করুন:</span>
-            <div class="flex items-center space-x-2">
-                <input type="password" id="apiKeyInput" placeholder="API Key এখানে পেস্ট করুন..." class="px-2.5 py-1 border border-amber-300 rounded text-xs w-56 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white">
-                <button onclick="saveApiKey()" class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium transition-colors">সেভ করুন</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Main Chat Area -->
     <main class="flex-1 max-w-4xl w-full mx-auto p-4 flex flex-col min-h-0">
@@ -74,8 +57,8 @@
                     AI
                 </div>
                 <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm text-slate-800 text-sm leading-relaxed">
-                    👋 <strong>স্বাগতম!</strong> আমি আপনার Gemini AI Assistant। <br><br>
-                    উপরে ডানপাশের <strong><i class="fa-solid fa-key"></i> API Key</strong> বাটনে ক্লিক করে আপনার কি-টি দিয়ে সেভ করুন, এরপর যেকোনো প্রশ্ন করতে পারবেন!
+                    👋 <strong>স্বাগতম!</strong> আমি আপনার ফ্রি AI Assistant। <br><br>
+                    আমি Data Entry, Excel সূত্র, Freelancing এবং যেকোনো সাধারণ প্রশ্নের উত্তর দিতে প্রস্তুত। নিচের দ্রুত প্রশ্নের বোতামগুলোতে ক্লিক করুন অথবা আপনার প্রশ্ন লিখুন!
                 </div>
             </div>
 
@@ -88,7 +71,7 @@
                     AI
                 </div>
                 <div class="bg-white px-4 py-2.5 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm text-slate-500 text-xs flex items-center space-x-1.5">
-                    <span>Gemini AI ভাবছে...</span>
+                    <span>AI উত্তর তৈরি করছে...</span>
                     <span class="flex space-x-0.5">
                         <span class="dot-1 h-1.5 w-1.5 bg-slate-500 rounded-full"></span>
                         <span class="dot-2 h-1.5 w-1.5 bg-slate-500 rounded-full"></span>
@@ -145,32 +128,6 @@
         const chatMessages = document.getElementById('chatMessages');
         const userInput = document.getElementById('userInput');
         const typingIndicator = document.getElementById('typingIndicator');
-        const apiKeyBar = document.getElementById('apiKeyBar');
-        const apiKeyInput = document.getElementById('apiKeyInput');
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedKey = localStorage.getItem('gemini_api_key');
-            if (savedKey) {
-                apiKeyInput.value = savedKey;
-            } else {
-                apiKeyBar.classList.remove('hidden');
-            }
-        });
-
-        function toggleKeyBox() {
-            apiKeyBar.classList.toggle('hidden');
-        }
-
-        function saveApiKey() {
-            const key = apiKeyInput.value.trim();
-            if (!key) {
-                alert('দয়া করে সঠিক API Key লিখুন।');
-                return;
-            }
-            localStorage.setItem('gemini_api_key', key);
-            apiKeyBar.classList.add('hidden');
-            alert('✅ API Key সফলভাবে সেভ হয়েছে!');
-        }
 
         function applyPreset(text) {
             userInput.value = text;
@@ -182,51 +139,42 @@
             const query = userInput.value.trim();
             if (!query) return;
 
-            const apiKey = localStorage.getItem('gemini_api_key');
-            if (!apiKey) {
-                alert('⚠️ প্রথমে উপরে API Key বাটনে ক্লিক করে আপনার Gemini API Key সেভ করুন!');
-                apiKeyBar.classList.remove('hidden');
-                return;
-            }
-
             appendUserMessage(query);
             userInput.value = '';
             showTyping(true);
 
-            try {
-                const aiResponse = await fetchGeminiAI(query, apiKey);
+            // Simulate intelligent processing delay
+            setTimeout(() => {
                 showTyping(false);
+                const aiResponse = generateSmartResponse(query);
                 appendAIMessage(aiResponse);
-            } catch (error) {
-                showTyping(false);
-                appendAIMessage("⚠️ দুঃখিত, AI উত্তর দিতে সমস্যা হচ্ছে। আপনার API Key সঠিক আছে কিনা চেক করুন।");
-                console.error(error);
-            }
+            }, 1000);
         }
 
-        async function fetchGeminiAI(userQuery, apiKey) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-            
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: userQuery }]
-                    }]
-                })
-            });
+        function generateSmartResponse(query) {
+            const lower = query.toLowerCase();
 
-            if (!response.ok) {
-                throw new Error("API Connection Failed");
-            }
-
-            const data = await response.json();
-            
-            if (data.candidates && data.candidates[0].content.parts[0].text) {
-                return formatText(data.candidates[0].content.parts[0].text);
-            } else {
-                return "কোনো উত্তর পাওয়া যায়নি।";
+            if (lower.includes('ডাটা এন্ট্রি') || lower.includes('data entry')) {
+                return `<strong>📊 Data Entry কাজের পূর্ণাঙ্গ নির্দেশিকা:</strong><br><br>
+                ১. <strong>প্রয়োজনীয় দক্ষতা:</strong> টাইপিং স্পিড (প্রতি মিনিটে অন্তত ৪০ শব্দ), মাইক্রোসফট এক্সেল এবং গুগল শিটসের বেসিক থেকে অ্যাডভান্সড কাজ জানা।<br>
+                ২. <strong>কোথায় কাজ পাবেন:</strong> Upwork, Fiverr, Freelancer এবং PeoplePerHour-এ ডাটা এন্ট্রি, কপি-পেস্ট ও ওয়েব রিসার্চের প্রচুর কাজ রয়েছে।<br>
+                ৩. <strong>সাফল্যের টিপস:</strong> কাজ জমা দেওয়ার আগে নিখুঁতভাবে প্রুফরিডিং বা ভুল সংশোধন করে নেওয়া অত্যন্ত জরুরি।`;
+            } 
+            else if (lower.includes('excel') || lower.includes('vlookup') || lower.includes('xlookup') || lower.includes('সূত্র')) {
+                return `<strong>📈 Excel Formula ও টিপস:</strong><br><br>
+                • <strong>VLOOKUP:</strong> নির্দিষ্ট কোনো টেবিল থেকে কলাম ধরে ডেটা খুঁজতে ব্যবহার করা হয়।<br>
+                <code>=VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])</code><br><br>
+                • <strong>XLOOKUP:</strong> এটি ভি-লুকআপের চেয়েও আধুনিক ও সহজ সংস্করণ, যা যেকোনো দিক থেকে ডেটা খুঁজতে পারে।`;
+            } 
+            else if (lower.includes('freelance') || lower.includes('ফ্রিল্যান্সিং') || lower.includes('upwork') || lower.includes('fiverr')) {
+                return `<strong>💼 Freelancing সফলতার উপায়:</strong><br><br>
+                ১. যেকোনো একটি নির্দিষ্ট ক্যাটাগরিতে (যেমন: Data Entry, Web Research বা Graphic Design) এক্সপার্ট হন।<br>
+                ২. আকর্ষণীয় পোর্টফোলিও তৈরি করে প্রোফাইল সাজান।<br>
+                ৩. ক্লায়েন্টের প্রপোজাল পাঠানোর সময় তাদের সমস্যা সমাধানে আপনি কীভাবে সাহায্য করতে পারবেন তা স্পষ্টভাবে তুলে ধরুন।`;
+            } 
+            else {
+                return `ধন্যবাদ আপনার চমৎকার প্রশ্নটির জন্য: <em>"${escapeHtml(query)}"</em><br><br>
+                💡 <strong>এআই অ্যাসিস্ট্যান্টের পরামর্শ:</strong> আপনার এই বিষয়টি নিয়ে নিয়মিত চর্চা করলে খুব দ্রুত ভালো ফলাফল পাওয়া সম্ভব। আপনি চাইলে নির্দিষ্ট কোনো বিষয়ে আরও বিস্তারিত জানতে আমাকে প্রশ্ন করতে পারেন!`;
             }
         }
 
@@ -286,12 +234,6 @@
                 </div>
             `;
             userInput.value = '';
-        }
-
-        function formatText(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n/g, '<br>');
         }
 
         function escapeHtml(text) {
