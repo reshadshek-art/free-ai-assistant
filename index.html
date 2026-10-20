@@ -39,8 +39,7 @@
             </div>
             
             <div class="flex items-center space-x-2">
-                <!-- API Key Input Toggle Button -->
-                <button onclick="toggleKeyBox()" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-medium rounded-lg transition-colors border border-amber-200 flex items-center space-x-1" title="API Key সেটিং">
+                <button onclick="toggleKeyBox()" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-medium rounded-lg transition-colors border border-amber-200 flex items-center space-x-1">
                     <i class="fa-solid fa-key"></i>
                     <span class="hidden sm:inline">API Key</span>
                 </button>
@@ -55,7 +54,7 @@
     <!-- Hidden API Key Config Bar -->
     <div id="apiKeyBar" class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-xs text-amber-800 hidden">
         <div class="max-w-4xl mx-auto flex items-center justify-between flex-wrap gap-2">
-            <span>আপনার Gemini API Key এখানে একবার বসান (ব্রাউজারে সেভ থাকবে):</span>
+            <span>আপনার Gemini API Key এখানে পেস্ট করুন:</span>
             <div class="flex items-center space-x-2">
                 <input type="password" id="apiKeyInput" placeholder="API Key এখানে পেস্ট করুন..." class="px-2.5 py-1 border border-amber-300 rounded text-xs w-56 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white">
                 <button onclick="saveApiKey()" class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium transition-colors">সেভ করুন</button>
@@ -76,7 +75,7 @@
                 </div>
                 <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm text-slate-800 text-sm leading-relaxed">
                     👋 <strong>স্বাগতম!</strong> আমি আপনার Gemini AI Assistant। <br><br>
-                    সঠিকভাবে কাজ করার জন্য উপরে ডানপাশের <strong><i class="fa-solid fa-key"></i> API Key</strong> বাটনে ক্লিক করে আপনার জেমিনি এপিআই কি দিন, এরপর যেকোনো প্রশ্ন করতে পারবেন!
+                    উপরে ডানপাশের <strong><i class="fa-solid fa-key"></i> API Key</strong> বাটনে ক্লিক করে আপনার কি-টি দিয়ে সেভ করুন, এরপর যেকোনো প্রশ্ন করতে পারবেন!
                 </div>
             </div>
 
@@ -149,13 +148,12 @@
         const apiKeyBar = document.getElementById('apiKeyBar');
         const apiKeyInput = document.getElementById('apiKeyInput');
 
-        // Check if API key is stored in browser
         window.addEventListener('DOMContentLoaded', () => {
             const savedKey = localStorage.getItem('gemini_api_key');
             if (savedKey) {
                 apiKeyInput.value = savedKey;
             } else {
-                apiKeyBar.classList.remove('hidden'); // Show if not set
+                apiKeyBar.classList.remove('hidden');
             }
         });
 
@@ -207,11 +205,19 @@
         }
 
         async function fetchGeminiAI(userQuery, apiKey) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            // Flexible authentication support for both standard and service account keys
+            let url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
+            let headers = { 'Content-Type': 'application/json' };
+
+            if (apiKey.startsWith('AQ.')) {
+                headers['Authorization'] = `Bearer ${apiKey}`;
+            } else {
+                url += `?key=${apiKey}`;
+            }
             
             const response = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({
                     contents: [{
                         parts: [{ text: userQuery }]
